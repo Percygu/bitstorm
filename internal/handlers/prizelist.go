@@ -13,16 +13,16 @@ var (
 )
 
 type PrizeListHandler struct {
-	ServiceAdmin service2.PrizeService
+	ServicePrize service2.PrizeService
 }
 
 func initPrizeListHandler() {
 	prizeListHandler = &PrizeListHandler{
-		ServiceAdmin: service2.NewPrizeService(),
+		ServicePrize: service2.NewPrizeService(),
 	}
 }
 
-// GetPrizeListHandler 获取全局应用
+// GetPrizeListHandler 获取奖品列表处理器
 func GetPrizeListHandler() *PrizeListHandler {
 	once.Do(initPrizeListHandler)
 	return prizeListHandler
@@ -36,9 +36,9 @@ func (a *PrizeListHandler) CheckInput(args ...interface{}) error {
 }
 
 func (a *PrizeListHandler) Process(ctx context.Context, args ...interface{}) (interface{}, error) {
-	list, err := a.ServiceAdmin.GetPrizeList()
+	list, err := a.ServicePrize.GetPrizeList()
 	if err != nil {
-		return nil, fmt.Errorf("AppAdmin|GetPrizeList:%v", err)
+		return nil, fmt.Errorf("PrizeListHandler|GetPrizeList:%v", err)
 	}
 	return list, nil
 }
