@@ -73,6 +73,9 @@ func (p *prizeService) GetPrizeMap() (map[string]*ViewPrize, error) {
 	}
 	prizeMap := make(map[string]*ViewPrize)
 	for _, prize := range list {
+		if prize.SysStatus == constant.PrizeStatusDelete {
+			continue
+		}
 		prizeMap[prize.Title] = &ViewPrize{
 			Id:        prize.Id,
 			Title:     prize.Title,

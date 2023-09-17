@@ -1,5 +1,5 @@
 .PHONY: all
-TARGET := lotterysvr
+TARGET := bitstormsvr
 GOENV := GOOS=linux GOARCH=amd64
 GOMACENV := GOOS=darwin GOARCH=amd64
 all:
