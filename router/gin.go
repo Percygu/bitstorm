@@ -2,8 +2,8 @@ package router
 
 import (
 	"bitstorm/configs"
+	"bitstorm/internal/pkg/middlewares/log"
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"strconv"
 )
