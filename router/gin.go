@@ -13,6 +13,7 @@ func InitRouterAndServe() {
 	setAppRunMode()
 	r := gin.Default()
 
+	setMiddleWare(r)
 	// 设置路由
 	setRoutes(r)
 
@@ -33,4 +34,10 @@ func setAppRunMode() {
 func setGinLog(out io.Writer) {
 	gin.DefaultWriter = out
 	gin.DefaultErrorWriter = out
+}
+
+// 设置一些中间件：比如Recover
+
+func setMiddleWare(r *gin.Engine) {
+	r.Use()
 }

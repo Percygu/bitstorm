@@ -2,6 +2,7 @@ package service
 
 import "time"
 
+// 对外返回的数据（区别于存储层的数据）
 type ViewPrize struct {
 	Id        uint      `json:"id"`
 	Title     string    `json:"title"`

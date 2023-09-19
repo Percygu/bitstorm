@@ -37,6 +37,7 @@ func (a *PrizeListHandler) CheckInput(args ...interface{}) error {
 
 func (a *PrizeListHandler) Process(ctx context.Context, args ...interface{}) (interface{}, error) {
 	list, err := a.ServicePrize.GetPrizeList()
+
 	if err != nil {
 		return nil, fmt.Errorf("PrizeListHandler|GetPrizeList:%v", err)
 	}

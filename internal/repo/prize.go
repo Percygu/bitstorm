@@ -88,11 +88,16 @@ func (r *PrizeRepo) Update(db *gorm.DB, prize *model.Prize, cols ...string) erro
 func (r *PrizeRepo) GetFromCache(id uint) (*model.Prize, error) {
 	redisCli := cache.GetRedisCli()
 	idStr := strconv.FormatUint(uint64(id), 10)
-	ret, err := redisCli.Get(context.Background(), idStr).Result()
+	ret, exist, err := redisCli.Get(context.Background(), idStr)
 	if err != nil {
 		log.Errorf("PrizeRepo|GetFromCache:" + err.Error())
 		return nil, err
 	}
+
+	if !exist {
+		return nil, nil
+	}
+
 	prize := model.Prize{}
 	json.Unmarshal([]byte(ret), &model.Prize{})
 
