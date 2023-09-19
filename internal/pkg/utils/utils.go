@@ -8,12 +8,18 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	uuid2 "github.com/google/uuid"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
 	"unsafe"
 )
+
+func NewUuid() string {
+	uuid := uuid2.New()
+	return uuid.String()
+}
 
 // NowUnix 当前时间戳
 func NowUnix() int {

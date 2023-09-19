@@ -1,6 +1,7 @@
 package log
 
 import (
+	"bitstorm/internal/pkg/constant"
 	"context"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -12,7 +13,7 @@ var (
 	log *zap.Logger
 )
 
-// 默认日志组件使用zap
+// Logger 默认日志组件使用zap
 type Logger interface {
 	Error(v ...interface{})
 	Warn(v ...interface{})
@@ -189,7 +190,9 @@ func DebugContext(ctx context.Context, args ...interface{}) {
 
 // DebugContextf 打印 Debug 日志
 func DebugContextf(ctx context.Context, format string, args ...interface{}) {
-	GetDefaultLogger().Debugf(format, args...)
+	value := ctx.Value(constant.ReqID)
+	args = append([]interface{}{value}, args...)
+	GetDefaultLogger().Debugf(constant.ReqID+":%s|"+format, args...)
 }
 
 // InfoContext 打印 Info 日志
@@ -199,9 +202,9 @@ func InfoContext(ctx context.Context, args ...interface{}) {
 
 // InfoContextf 打印 Info 日志
 func InfoContextf(ctx context.Context, format string, args ...interface{}) {
-	value := ctx.Value("req_id")
+	value := ctx.Value(constant.ReqID)
 	args = append([]interface{}{value}, args...)
-	GetDefaultLogger().Infof("req_id:%s, "+format, args...)
+	GetDefaultLogger().Infof(constant.ReqID+":%s|"+format, args...)
 }
 
 // WarnContext 打印 Warn 日志
@@ -211,7 +214,9 @@ func WarnContext(ctx context.Context, args ...interface{}) {
 
 // WarnContextf 打印 Warn 日志
 func WarnContextf(ctx context.Context, format string, args ...interface{}) {
-	GetDefaultLogger().Warnf(format, args...)
+	value := ctx.Value(constant.ReqID)
+	args = append([]interface{}{value}, args...)
+	GetDefaultLogger().Warnf(constant.ReqID+":%s|"+format, args...)
 }
 
 // ErrorContext 打印 Error 日志
@@ -219,7 +224,9 @@ func ErrorContext(ctx context.Context, args ...interface{}) {
 	GetDefaultLogger().Error(args...)
 }
 func ErrorContextf(ctx context.Context, format string, args ...interface{}) {
-	GetDefaultLogger().Errorf(format, args...)
+	value := ctx.Value(constant.ReqID)
+	args = append([]interface{}{value}, args...)
+	GetDefaultLogger().Errorf(constant.ReqID+":%s|"+format, args...)
 }
 func Fatalf(format string, args ...interface{}) {
 	Errorf(format, args...)

@@ -6,7 +6,6 @@ import (
 	"bitstorm/internal/service"
 	"context"
 	"github.com/gin-gonic/gin"
-	uuid2 "github.com/google/uuid"
 	"net/http"
 )
 
@@ -31,23 +30,17 @@ func GetPrizeList(c *gin.Context) {
 		h.resp.Msg = constant.GetErrMsg(h.resp.Code)
 		c.JSON(http.StatusOK, h.resp)
 	}()
-
 	// 获取请求数据
 	c.ShouldBind(h.req)
-
 	handlers.Run(&h)
 }
 
-func (h *PrizeListHandler) CheckInput() error {
+func (h *PrizeListHandler) CheckInput(ctx context.Context) error {
 	h.resp.Code = constant.ErrInputInvalid
-
 	return nil
 }
 
-func (h *PrizeListHandler) Process() {
-	uuid := uuid2.New()
-	reqID := uuid.String()
-	ctx := context.WithValue(context.Background(), "req_id", reqID)
+func (h *PrizeListHandler) Process(ctx context.Context) {
 	v, err := h.service.GetPrizeList(ctx)
 	if err != nil {
 		// TODO:

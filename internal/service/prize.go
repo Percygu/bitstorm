@@ -9,12 +9,11 @@ import (
 	"fmt"
 )
 
-// 需要什么功能，抽象不同的Service
-
+// PrizeService 需要什么功能，抽象不同的Service
 type PrizeService interface {
 	GetPrizeList(ctx context.Context) ([]*ViewPrize, error)
-	GetPrize(id uint) (*ViewPrize, error)
-	GetPrizeMap() (map[string]*ViewPrize, error)
+	GetPrize(ctx context.Context, id uint) (*ViewPrize, error)
+	GetPrizeMap(ctx context.Context) (map[string]*ViewPrize, error)
 }
 
 type prizeService struct {
@@ -32,8 +31,8 @@ func (p *prizeService) GetPrizeList(ctx context.Context) ([]*ViewPrize, error) {
 	db := gormcli.GetDB()
 	list, err := p.prizeReop.GetAll(db)
 	if err != nil {
-		log.Errorf("GetPrizeList err:%v", err)
-		return nil, fmt.Errorf("prizeService|GetAll: %v", err)
+		log.ErrorContextf(ctx, "prizeService|GetPrizeList err:%v", err)
+		return nil, fmt.Errorf("prizeService|GetPrizeList: %v", err)
 	}
 	prizeList := make([]*ViewPrize, 0)
 	for _, prize := range list {
@@ -52,10 +51,11 @@ func (p *prizeService) GetPrizeList(ctx context.Context) ([]*ViewPrize, error) {
 	return prizeList, nil
 }
 
-func (p *prizeService) GetPrize(id uint) (*ViewPrize, error) {
+func (p *prizeService) GetPrize(ctx context.Context, id uint) (*ViewPrize, error) {
 	prizeModel, err := p.prizeReop.Get(gormcli.GetDB(), id)
 	if err != nil {
-		return nil, fmt.Errorf("adminService|GetPrize:%v", err)
+		log.ErrorContextf(ctx, "prizeService|GetPrize:%v", err)
+		return nil, fmt.Errorf("prizeService|GetPrize:%v", err)
 	}
 	prize := &ViewPrize{
 		Id:        prizeModel.Id,
@@ -68,11 +68,11 @@ func (p *prizeService) GetPrize(id uint) (*ViewPrize, error) {
 	return prize, nil
 }
 
-func (p *prizeService) GetPrizeMap() (map[string]*ViewPrize, error) {
+func (p *prizeService) GetPrizeMap(ctx context.Context) (map[string]*ViewPrize, error) {
 	db := gormcli.GetDB()
 	list, err := p.prizeReop.GetAll(db)
 	if err != nil {
-		log.Errorf("GetPrizeList err:%v", err)
+		log.ErrorContextf(ctx, "GetPrizeList err:%v", err)
 		return nil, fmt.Errorf("prizeService|GetAll: %v", err)
 	}
 	prizeMap := make(map[string]*ViewPrize)

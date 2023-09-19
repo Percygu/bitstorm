@@ -1,5 +1,7 @@
 package constant
 
+const ReqID = "req_id"
+
 // 时间标准化
 const (
 	SysTimeFormat      = "2006-01-02 15:04:05"
