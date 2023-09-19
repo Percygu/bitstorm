@@ -187,47 +187,37 @@ func Errorf(format string, args ...interface{}) {
 func DebugContextf(ctx context.Context, format string, args ...interface{}) {
 	value := ctx.Value(constant.ReqID)
 	args = append([]interface{}{value}, args...)
-	getDefaultLogger().Debugf("req_id:%s, "+format, args...)
-	value := ctx.Value(constant.ReqID)
-	args = append([]interface{}{value}, args...)
-	GetDefaultLogger().Debugf(constant.ReqID+":%s|"+format, args...)
+	getDefaultLogger().Debugf(constant.ReqID+":%s|"+format, args...)
 }
 
 // InfoContext 打印 Info 日志
 func InfoContext(ctx context.Context, args ...interface{}) {
-	GetDefaultLogger().Info(args...)
+	getDefaultLogger().Info(args...)
 }
 
 // InfoContextf 打印 Info 日志
 func InfoContextf(ctx context.Context, format string, args ...interface{}) {
 	value := ctx.Value(constant.ReqID)
 	args = append([]interface{}{value}, args...)
-	getDefaultLogger().Infof("req_id:%s, "+format, args...)
-	GetDefaultLogger().Infof(constant.ReqID+":%s|"+format, args...)
+	getDefaultLogger().Infof(constant.ReqID+":%s|"+format, args...)
 }
 
 // WarnContext 打印 Warn 日志
 func WarnContext(ctx context.Context, args ...interface{}) {
-	GetDefaultLogger().Warn(args...)
+	getDefaultLogger().Warn(args...)
 }
 
 // WarnContextf 打印 Warn 日志
 func WarnContextf(ctx context.Context, format string, args ...interface{}) {
 	value := ctx.Value(constant.ReqID)
 	args = append([]interface{}{value}, args...)
-	getDefaultLogger().Warnf("req_id:%s, "+format, args...)
-	value := ctx.Value(constant.ReqID)
-	args = append([]interface{}{value}, args...)
-	GetDefaultLogger().Warnf(constant.ReqID+":%s|"+format, args...)
+	getDefaultLogger().Warnf(constant.ReqID+":%s|"+format, args...)
 }
 
 func ErrorContextf(ctx context.Context, format string, args ...interface{}) {
 	value := ctx.Value(constant.ReqID)
 	args = append([]interface{}{value}, args...)
-	getDefaultLogger().Errorf("req_id:%s, "+format, args...)
-	value := ctx.Value(constant.ReqID)
-	args = append([]interface{}{value}, args...)
-	GetDefaultLogger().Errorf(constant.ReqID+":%s|"+format, args...)
+	getDefaultLogger().Errorf(constant.ReqID+":%s|"+format, args...)
 }
 func Fatalf(format string, args ...interface{}) {
 	Errorf(format, args...)

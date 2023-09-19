@@ -74,7 +74,7 @@ func GetDBFromCtx(ctx context.Context) *gorm.DB {
 	if iface != nil {
 		tx, ok := iface.(*gorm.DB)
 		if !ok {
-			log.Panicf("unexpect context value type: %s", reflect.TypeOf(tx))
+			log.ErrorContextf(ctx, "unexpect context value type: %s", reflect.TypeOf(tx))
 			return nil
 		}
 

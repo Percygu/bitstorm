@@ -20,7 +20,7 @@ func InitRouterAndServe() {
 	// 启动server
 	port := configs.GetGlobalConfig().AppConfig.Port
 	if err := r.Run(":" + strconv.Itoa(port)); err != nil {
-		log.Error("start server err:" + err.Error())
+		log.Errorf("start server err:" + err.Error())
 	}
 }
 
