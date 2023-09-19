@@ -21,6 +21,15 @@ db:
   max_open_conn: 20         # 最大连接数
   max_idle_time: 300        # 最大空闲时间
 
+log_config:
+  level: info
+  log_path: ./log
+  file_name: bitstorm.log
+  max_age: 24
+  max_size: 1
+  compress: true
+  max_backups: 10
+
 redis:
   rhost: "127.0.0.1"
   rport: 6379

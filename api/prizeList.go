@@ -4,7 +4,9 @@ import (
 	"bitstorm/internal/handlers"
 	"bitstorm/internal/pkg/constant"
 	"bitstorm/internal/service"
+	"context"
 	"github.com/gin-gonic/gin"
+	uuid2 "github.com/google/uuid"
 	"net/http"
 )
 
@@ -20,7 +22,6 @@ type PrizeListHandler struct {
 // GetPrizeList 获取奖品列表
 func GetPrizeList(c *gin.Context) {
 	// todo: 参数获取，校验
-
 	h := PrizeListHandler{
 		service: service.NewPrizeService(),
 	}
@@ -44,8 +45,10 @@ func (h *PrizeListHandler) CheckInput() error {
 }
 
 func (h *PrizeListHandler) Process() {
-
-	v, err := h.service.GetPrizeList()
+	uuid := uuid2.New()
+	reqID := uuid.String()
+	ctx := context.WithValue(context.Background(), "req_id", reqID)
+	v, err := h.service.GetPrizeList(ctx)
 	if err != nil {
 		// TODO:
 		h.resp.Code = constant.PrizeStatusDelete

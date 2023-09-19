@@ -4,3 +4,4 @@ log/*
 bitstormsvr.log
 bitstormsvr.pid
 bin/*
+*.log

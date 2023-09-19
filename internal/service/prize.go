@@ -3,15 +3,16 @@ package service
 import (
 	"bitstorm/internal/pkg/constant"
 	"bitstorm/internal/pkg/middlewares/gormcli"
+	"bitstorm/internal/pkg/middlewares/log"
 	"bitstorm/internal/repo"
+	"context"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 )
 
 // 需要什么功能，抽象不同的Service
 
 type PrizeService interface {
-	GetPrizeList() ([]*ViewPrize, error)
+	GetPrizeList(ctx context.Context) ([]*ViewPrize, error)
 	GetPrize(id uint) (*ViewPrize, error)
 	GetPrizeMap() (map[string]*ViewPrize, error)
 }
@@ -26,7 +27,8 @@ func NewPrizeService() PrizeService {
 	}
 }
 
-func (p *prizeService) GetPrizeList() ([]*ViewPrize, error) {
+func (p *prizeService) GetPrizeList(ctx context.Context) ([]*ViewPrize, error) {
+	log.InfoContextf(ctx, "GetPrizeList!!!!!")
 	db := gormcli.GetDB()
 	list, err := p.prizeReop.GetAll(db)
 	if err != nil {
