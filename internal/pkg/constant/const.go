@@ -13,3 +13,8 @@ const (
 	PrizeStatusNormal = 1 // 正常
 	PrizeStatusDelete = 2 // 删除
 )
+
+// 一些固定字符串
+const (
+	ReqID = "req_id"
+)

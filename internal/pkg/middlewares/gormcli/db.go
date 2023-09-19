@@ -2,9 +2,9 @@ package gormcli
 
 import (
 	"bitstorm/configs"
+	"bitstorm/internal/pkg/middlewares/log"
 	"context"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"reflect"

@@ -2,9 +2,9 @@ package cache
 
 import (
 	"bitstorm/configs"
+	"bitstorm/internal/pkg/middlewares/log"
 	"fmt"
 	redis "github.com/redis/go-redis/v9"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"strconv"
 	"sync"

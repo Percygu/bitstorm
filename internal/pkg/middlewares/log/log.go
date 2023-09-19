@@ -158,38 +158,36 @@ func (w *zapLoggerWrapper) getLogWriter(typeName string) zapcore.WriteSyncer {
 	})
 }
 
-// GetDefaultLogger 获取默认日志实现
-func GetDefaultLogger() Logger {
+// getDefaultLogger 获取默认日志实现
+func getDefaultLogger() Logger {
 	return logger
 }
 
 // Debugf 打印 Debug 日志
 func Debugf(format string, args ...interface{}) {
-	GetDefaultLogger().Debugf(format, args...)
+	getDefaultLogger().Debugf(format, args...)
 }
 
 // Infof 打印 Info 日志
 func Infof(format string, args ...interface{}) {
-	GetDefaultLogger().Infof(format, args...)
+	getDefaultLogger().Infof(format, args...)
 }
 
 // Warnf 打印 Warn 日志
 func Warnf(format string, args ...interface{}) {
-	GetDefaultLogger().Warnf(format, args...)
+	getDefaultLogger().Warnf(format, args...)
 }
 
 // Errorf 打印 Error 日志
 func Errorf(format string, args ...interface{}) {
-	GetDefaultLogger().Errorf(format, args...)
-}
-
-// DebugContext 打印 Debug 日志
-func DebugContext(ctx context.Context, args ...interface{}) {
-	GetDefaultLogger().Debug(args...)
+	getDefaultLogger().Errorf(format, args...)
 }
 
 // DebugContextf 打印 Debug 日志
 func DebugContextf(ctx context.Context, format string, args ...interface{}) {
+	value := ctx.Value(constant.ReqID)
+	args = append([]interface{}{value}, args...)
+	getDefaultLogger().Debugf("req_id:%s, "+format, args...)
 	value := ctx.Value(constant.ReqID)
 	args = append([]interface{}{value}, args...)
 	GetDefaultLogger().Debugf(constant.ReqID+":%s|"+format, args...)
@@ -204,6 +202,7 @@ func InfoContext(ctx context.Context, args ...interface{}) {
 func InfoContextf(ctx context.Context, format string, args ...interface{}) {
 	value := ctx.Value(constant.ReqID)
 	args = append([]interface{}{value}, args...)
+	getDefaultLogger().Infof("req_id:%s, "+format, args...)
 	GetDefaultLogger().Infof(constant.ReqID+":%s|"+format, args...)
 }
 
@@ -216,14 +215,16 @@ func WarnContext(ctx context.Context, args ...interface{}) {
 func WarnContextf(ctx context.Context, format string, args ...interface{}) {
 	value := ctx.Value(constant.ReqID)
 	args = append([]interface{}{value}, args...)
+	getDefaultLogger().Warnf("req_id:%s, "+format, args...)
+	value := ctx.Value(constant.ReqID)
+	args = append([]interface{}{value}, args...)
 	GetDefaultLogger().Warnf(constant.ReqID+":%s|"+format, args...)
 }
 
-// ErrorContext 打印 Error 日志
-func ErrorContext(ctx context.Context, args ...interface{}) {
-	GetDefaultLogger().Error(args...)
-}
 func ErrorContextf(ctx context.Context, format string, args ...interface{}) {
+	value := ctx.Value(constant.ReqID)
+	args = append([]interface{}{value}, args...)
+	getDefaultLogger().Errorf("req_id:%s, "+format, args...)
 	value := ctx.Value(constant.ReqID)
 	args = append([]interface{}{value}, args...)
 	GetDefaultLogger().Errorf(constant.ReqID+":%s|"+format, args...)
