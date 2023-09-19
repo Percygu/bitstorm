@@ -3,10 +3,10 @@ package repo
 import (
 	"bitstorm/internal/model"
 	"bitstorm/internal/pkg/middlewares/cache"
+	"bitstorm/internal/pkg/middlewares/log"
 	"context"
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"strconv"
 )
