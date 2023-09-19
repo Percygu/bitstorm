@@ -8,6 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// 需要什么功能，抽象不同的Service
+
 type PrizeService interface {
 	GetPrizeList() ([]*ViewPrize, error)
 	GetPrize(id uint) (*ViewPrize, error)

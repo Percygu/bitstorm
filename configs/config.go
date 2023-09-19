@@ -83,6 +83,7 @@ func readConf() {
 	viper.SetConfigType("yml")
 	viper.AddConfigPath("../configs")
 	viper.AddConfigPath("./configs")
+	viper.AddConfigPath("../../../../configs")
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic("read config file err:" + err.Error())
@@ -118,9 +119,9 @@ func InitConfig() {
 	case "file":
 		logger, err := rlog.New(
 			globalConf.LogConfig.LogPath+".%Y%m%d",
-			//rlog.WithLinkName(globalConf.LogConf.LogPath),
+			// rlog.WithLinkName(globalConf.LogConf.LogPath),
 			rlog.WithRotationCount(globalConf.LogConfig.SaveDays),
-			//rlog.WithMaxAge(time.Minute*3),
+			// rlog.WithMaxAge(time.Minute*3),
 			rlog.WithRotationTime(time.Hour*24),
 		)
 		if err != nil {

@@ -2,7 +2,7 @@ app:
   app_name: "lottery-system" # 应用名称
   version: "v1.0.1" # 版本
   port: 8081    # 服务启用端口
-  run_mode: release # 可选dev、release模式
+  run_mode: dev # 可选dev、release模式
 
 
 log:
@@ -22,8 +22,8 @@ db:
   max_idle_time: 300        # 最大空闲时间
 
 redis:
-  rhost: "121.43.102.177"
-  rport: 8089
+  rhost: "127.0.0.1"
+  rport: 6379
   rdb: 0
   passwd: ''
   poolsize: 100
