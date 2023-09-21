@@ -1,7 +1,7 @@
-package api
+package handlers
 
 import (
-	"bitstorm/internal/handlers"
+	"bitstorm/internal/handlers/params"
 	"bitstorm/internal/pkg/constant"
 	"bitstorm/internal/service"
 	"context"
@@ -10,7 +10,7 @@ import (
 )
 
 type PrizeListHandler struct {
-	req PrizeListRequest
+	req params.PrizeListRequest
 	// resp     PrizeListResponse
 	resp HttpResponse
 
@@ -32,7 +32,7 @@ func GetPrizeList(c *gin.Context) {
 	}()
 	// 获取请求数据
 	c.ShouldBind(h.req)
-	handlers.Run(&h)
+	Run(&h)
 }
 
 func (h *PrizeListHandler) CheckInput(ctx context.Context) error {

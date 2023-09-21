@@ -6,6 +6,13 @@ import (
 	"context"
 )
 
+// HttpResponse http独立请求返回结构体,这个通用的，不需要修改
+type HttpResponse struct {
+	Code constant.ErrCode `json:"code"`
+	Msg  string           `json:"msg"`
+	Data interface{}      `json:"data"`
+}
+
 type Handler interface {
 	CheckInput(ctx context.Context) error
 	Process(ctx context.Context)

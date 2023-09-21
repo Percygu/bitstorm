@@ -1,7 +1,7 @@
 package router
 
 import (
-	"bitstorm/api"
+	"bitstorm/internal/handlers"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -32,11 +32,11 @@ func setRoutes(r *gin.Engine) {
 func setAdminRoutes(r *gin.Engine) {
 	adminGroup := r.Group("admin")
 	// 获取奖品列表
-	adminGroup.GET("/get_prize_list", api.GetPrizeList)
+	adminGroup.GET("/get_prize_list", handlers.GetPrizeList)
 }
 
 func setLotteryRoutes(r *gin.Engine) {
 	lotteryGroup := r.Group("lottery")
 	// 获取中奖
-	lotteryGroup.GET("/get_lucky", AuthMiddleWare(), api.GetPrizeList)
+	lotteryGroup.GET("/get_lucky", AuthMiddleWare(), handlers.GetPrizeList)
 }
