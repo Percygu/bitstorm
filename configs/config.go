@@ -17,13 +17,11 @@ type AppConf struct {
 }
 
 type LogConf struct {
+	MaxSize    int    `mapstructure:"max_size"`
+	MaxBackups int    `mapstructure:"max_backups"`
 	FileName   string `mapstructure:"file_name"`
 	Level      string `mapstructure:"level"`
 	LogPath    string `mapstructure:"log_path"`
-	MaxSize    int    `mapstructure:"max_size"`
-	MaxAge     int    `mapstructure:"max_age"`
-	MaxBackups int    `mapstructure:"max_backups"`
-	Compress   bool   `mapstructure:"compress"`
 }
 
 // DbConf db配置结构
@@ -41,9 +39,9 @@ type DbConf struct {
 // RedisConf 配置
 type RedisConf struct {
 	Host     string `yaml:"rhost" mapstructure:"rhost"` // db主机地址
+	PassWord string `yaml:"passwd" mapstructure:"passwd"`
 	Port     int    `yaml:"rport" mapstructure:"rport"` // db端口
 	DB       int    `yaml:"rdb" mapstructure:"rdb"`
-	PassWord string `yaml:"passwd" mapstructure:"passwd"`
 	PoolSize int    `yaml:"poolsize" mapstructure:"poolsize"`
 }
 
@@ -86,11 +84,10 @@ func readConf() {
 func InitConfig() {
 	globalConf := GetGlobalConfig()
 
-	log.Init(log.WithLogLevel(globalConf.LogConfig.Level),
-		log.WithLogPath(globalConf.LogConfig.LogPath),
+	log.Init(
 		log.WithFileName(globalConf.LogConfig.FileName),
-		log.WithMaxAge(globalConf.LogConfig.MaxAge),
+		log.WithLogLevel(globalConf.LogConfig.Level),
+		log.WithLogPath(globalConf.LogConfig.LogPath),
 		log.WithMaxSize(globalConf.LogConfig.MaxSize),
-		log.WithMaxBackups(globalConf.LogConfig.MaxBackups),
-		log.WithCompress(globalConf.LogConfig.Compress))
+		log.WithMaxBackups(globalConf.LogConfig.MaxBackups))
 }

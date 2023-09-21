@@ -3,9 +3,9 @@ package log
 import (
 	"bitstorm/internal/pkg/constant"
 	"context"
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"gopkg.in/natefinch/lumberjack.v2"
 	"os"
 )
 
@@ -37,13 +37,10 @@ func Init(opts ...Option) {
 // Options 选项配置
 type Options struct {
 	LogPath    string // 日志路径
-	LogName    string // 日志名称
+	FileName   string // 日志名称
 	LogLevel   string // 日志级别
-	FileName   string // 文件名称
-	MaxAge     int    // 日志保留时间，以天为单位
 	MaxSize    int    // 日志保留大小，以 M 为单位
 	MaxBackups int    // 保留文件个数
-	Compress   bool   // 是否压缩
 }
 
 // Option 选项方法
@@ -53,13 +50,10 @@ type Option func(*Options)
 func NewOptions(opts ...Option) Options {
 	// 默认配置
 	options := Options{
-		LogName:    "shortUrlX",
+		FileName:   "bitstorm.log",
 		LogLevel:   "info",
-		FileName:   "app.log",
-		MaxAge:     10,
 		MaxSize:    100,
 		MaxBackups: 3,
-		Compress:   true,
 	}
 	for _, opt := range opts {
 		opt(&options)
@@ -74,22 +68,18 @@ func WithLogLevel(level string) Option {
 	}
 }
 
-// WithFileName 日志文件
-func WithFileName(filename string) Option {
+func WithFileName(fileName string) Option {
 	return func(o *Options) {
-		o.FileName = filename
+		o.FileName = fileName
 	}
 }
+
 func WithLogPath(logPath string) Option {
 	return func(o *Options) {
 		o.LogPath = logPath
 	}
 }
-func WithMaxAge(maxAge int) Option {
-	return func(o *Options) {
-		o.MaxAge = maxAge
-	}
-}
+
 func WithMaxSize(maxSize int) Option {
 	return func(o *Options) {
 		o.MaxSize = maxSize
@@ -98,11 +88,6 @@ func WithMaxSize(maxSize int) Option {
 func WithMaxBackups(maxBackups int) Option {
 	return func(o *Options) {
 		o.MaxBackups = maxBackups
-	}
-}
-func WithCompress(compress bool) Option {
-	return func(o *Options) {
-		o.Compress = compress
 	}
 }
 
@@ -149,13 +134,19 @@ func (w *zapLoggerWrapper) getEncoder() zapcore.Encoder {
 	return zapcore.NewConsoleEncoder(encoderConfig)
 }
 func (w *zapLoggerWrapper) getLogWriter(typeName string) zapcore.WriteSyncer {
-	return zapcore.AddSync(&lumberjack.Logger{
-		Filename:   w.options.LogPath + typeName + w.options.FileName, // 日志文件存放目录，
-		MaxSize:    w.options.MaxSize,                                 // 文件大小限制,单位MB
-		MaxBackups: w.options.MaxBackups,                              // 最大保留日志文件数量
-		MaxAge:     w.options.MaxAge,                                  // 日志文件保留天数
-		Compress:   w.options.Compress,                                // 是否压缩处理
-	})
+	logf, err := rotatelogs.New(
+		w.options.LogPath+"/"+typeName+"_%Y-%m-%d_"+w.options.FileName,
+		//rotatelogs.WithMaxAge(24*time.Hour),
+		rotatelogs.WithRotationCount(uint(w.options.MaxBackups)),
+		//rotatelogs.WithRotationTime(time.Minute),
+		rotatelogs.WithRotationSize(int64(w.options.MaxSize*1024*1024)),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return zapcore.AddSync(logf)
 }
 
 // getDefaultLogger 获取默认日志实现

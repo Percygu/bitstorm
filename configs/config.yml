@@ -22,13 +22,11 @@ db:
   max_idle_time: 300        # 最大空闲时间
 
 log_config:
-  level: info
-  log_path: ./log
-  file_name: bitstorm.log
-  max_age: 24
-  max_size: 1
-  compress: true
-  max_backups: 10
+  level: info # 日志等级
+  log_path: ./log # 日志目录
+  file_name: bitstorm.log # 日志名称（默认分info 和 error两种）
+  max_size: 10  # 一个日志多少MB
+  max_backups: 10 # 最多保留多少个日志
 
 redis:
   rhost: "127.0.0.1"
