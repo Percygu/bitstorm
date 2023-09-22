@@ -31,29 +31,29 @@ var (
 
 func Init(opts ...Option) {
 	// 初始化
-	logger = newSugarLogger(NewOptions(opts...))
+	logger = newSugarLogger(newOptions(opts...))
 }
 
 // Options 选项配置
 type Options struct {
-	LogPath    string // 日志路径
-	FileName   string // 日志名称
-	LogLevel   string // 日志级别
-	MaxSize    int    // 日志保留大小，以 M 为单位
-	MaxBackups int    // 保留文件个数
+	logPath    string // 日志路径
+	fileName   string // 日志名称
+	logLevel   string // 日志级别
+	maxSize    int    // 日志保留大小，以 M 为单位
+	maxBackups int    // 保留文件个数
 }
 
 // Option 选项方法
 type Option func(*Options)
 
-// NewOptions 初始化
-func NewOptions(opts ...Option) Options {
+// newOptions 初始化
+func newOptions(opts ...Option) Options {
 	// 默认配置
 	options := Options{
-		FileName:   "bitstorm.log",
-		LogLevel:   "info",
-		MaxSize:    100,
-		MaxBackups: 3,
+		fileName:   "bitstorm.log",
+		logLevel:   "info",
+		maxSize:    100,
+		maxBackups: 3,
 	}
 	for _, opt := range opts {
 		opt(&options)
@@ -64,30 +64,30 @@ func NewOptions(opts ...Option) Options {
 // WithLogLevel 日志级别
 func WithLogLevel(level string) Option {
 	return func(o *Options) {
-		o.LogLevel = level
+		o.logLevel = level
 	}
 }
 
 func WithFileName(fileName string) Option {
 	return func(o *Options) {
-		o.FileName = fileName
+		o.fileName = fileName
 	}
 }
 
 func WithLogPath(logPath string) Option {
 	return func(o *Options) {
-		o.LogPath = logPath
+		o.logPath = logPath
 	}
 }
 
 func WithMaxSize(maxSize int) Option {
 	return func(o *Options) {
-		o.MaxSize = maxSize
+		o.maxSize = maxSize
 	}
 }
 func WithMaxBackups(maxBackups int) Option {
 	return func(o *Options) {
-		o.MaxBackups = maxBackups
+		o.maxBackups = maxBackups
 	}
 }
 
@@ -110,7 +110,7 @@ func (w *zapLoggerWrapper) setSugaredLogger(encoder zapcore.Encoder) {
 		return lev >= zap.ErrorLevel
 	})
 	lowPriority := zap.LevelEnablerFunc(func(lev zapcore.Level) bool { // info和debug级别,debug级别是最低的
-		if w.options.LogLevel == "debug" {
+		if w.options.logLevel == "debug" {
 			return lev < zap.ErrorLevel && lev >= zap.DebugLevel
 		} else {
 			return lev < zap.ErrorLevel && lev >= zap.InfoLevel
@@ -135,11 +135,11 @@ func (w *zapLoggerWrapper) getEncoder() zapcore.Encoder {
 }
 func (w *zapLoggerWrapper) getLogWriter(typeName string) zapcore.WriteSyncer {
 	logf, err := rotatelogs.New(
-		w.options.LogPath+"/"+typeName+"_%Y-%m-%d_"+w.options.FileName,
+		w.options.logPath+"/"+typeName+"_%Y-%m-%d_"+w.options.fileName,
 		//rotatelogs.WithMaxAge(24*time.Hour),
-		rotatelogs.WithRotationCount(uint(w.options.MaxBackups)),
+		rotatelogs.WithRotationCount(uint(w.options.maxBackups)),
 		//rotatelogs.WithRotationTime(time.Minute),
-		rotatelogs.WithRotationSize(int64(w.options.MaxSize*1024*1024)),
+		rotatelogs.WithRotationSize(int64(w.options.maxSize*1024*1024)),
 	)
 
 	if err != nil {
