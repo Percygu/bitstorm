@@ -1,14 +1,12 @@
 package gormcli
 
 import (
-	"bitstorm/configs"
 	"bitstorm/internal/pkg/middlewares/log"
 	"context"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"reflect"
-	"sync"
 	"time"
 )
 
@@ -16,36 +14,106 @@ type ctxTransactionKey struct {
 }
 
 var (
-	db     *gorm.DB
-	dbOnce sync.Once
+	db *gorm.DB
 )
 
-// openDB 连接db
-func openDB() {
-	dbConfig := configs.GetGlobalConfig().DbConfig
-	connArgs := fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", dbConfig.User,
-		dbConfig.Password, dbConfig.Host, dbConfig.Port, dbConfig.DataBase)
-	// log.Info("mdb addr:" + connArgs)
+type Options struct {
+	addr        string // 地址，格式是 IP:PORT
+	user        string // 用户名
+	password    string // 密码
+	dataBase    string // db名
+	maxIdleConn int    // 最大空闲连接数
+	maxOpenConn int    // 最大打开的连接数
+	maxIdleTime int64  // 连接最大空闲时间
+}
 
-	var err error
-	db, err = gorm.Open(mysql.Open(connArgs), &gorm.Config{})
+type Option func(*Options)
+
+func WithAddr(addr string) Option {
+	return func(o *Options) {
+		o.addr = addr
+	}
+}
+
+func WithUser(user string) Option {
+	return func(o *Options) {
+		o.user = user
+	}
+}
+
+func WithPassword(password string) Option {
+	return func(o *Options) {
+		o.password = password
+	}
+}
+
+func WithDataBase(dataBase string) Option {
+	return func(o *Options) {
+		o.dataBase = dataBase
+	}
+}
+
+func WithMaxIdleConn(maxIdleConn int) Option {
+	return func(o *Options) {
+		o.maxIdleConn = maxIdleConn
+	}
+}
+
+func WithMaxOpenConn(maxOpenConn int) Option {
+	return func(o *Options) {
+		o.maxOpenConn = maxOpenConn
+	}
+}
+
+func WithMaxIdleTime(maxIdleTime int64) Option {
+	return func(o *Options) {
+		o.maxIdleTime = maxIdleTime
+	}
+}
+
+func NewOptions(opts ...Option) Options {
+	options := Options{
+		addr:        "127.0.0.1:3306",
+		user:        "root",
+		password:    "root",
+		dataBase:    "bitstorm",
+		maxIdleConn: 10,
+		maxOpenConn: 10,
+		maxIdleTime: 10,
+	}
+	for _, opt := range opts {
+		opt(&options)
+	}
+	return options
+}
+
+func Init(options ...Option) {
+	db = newDB(NewOptions(options...))
+}
+
+func newDB(options Options) *gorm.DB {
+
+	connArgs := fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local", options.user,
+		options.password, options.addr, options.dataBase)
+	db, err := gorm.Open(mysql.Open(connArgs), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
-		panic("fetch gormcli connection err:" + err.Error())
+		panic("fetch gormCli connection err:" + err.Error())
 	}
 
-	sqlDB.SetMaxIdleConns(dbConfig.MaxIdleConn)                                        // 设置最大空闲连接
-	sqlDB.SetMaxOpenConns(dbConfig.MaxOpenConn)                                        // 设置最大打开的连接
-	sqlDB.SetConnMaxLifetime(time.Duration(dbConfig.MaxIdleTime * int64(time.Second))) // 设置空闲时间为(s)
+	sqlDB.SetMaxIdleConns(options.maxIdleConn)                                        // 设置最大空闲连接
+	sqlDB.SetMaxOpenConns(options.maxOpenConn)                                        // 设置最大打开的连接
+	sqlDB.SetConnMaxLifetime(time.Duration(options.maxIdleTime * int64(time.Second))) // 设置空闲时间为(s)
+
+	return db
 }
 
 // GetDB 获取数据库连接
 func GetDB() *gorm.DB {
-	dbOnce.Do(openDB)
 	return db
 }
 

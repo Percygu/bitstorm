@@ -5,15 +5,8 @@ app:
   run_mode: dev # 可选dev、release模式
 
 
-log:
-  log_pattern: file # 可选stdout, stderr, file模式
-  log_path: ./log/server.log # 日志路径
-  save_days: 5 # 保存天数
-  level: info # panic,fatal,error,warn,info,debug,trace
-
 db:
-  host: "121.43.102.177"           # host
-  port: 8088                # port
+  addr: "127.0.0.1:3306" # db地址
   user: "root"              # user
   password: "123456"        # password
   database: "lottery_system" # dbname
@@ -29,8 +22,7 @@ log_config:
   max_backups: 10 # 最多保留多少个日志
 
 redis:
-  rhost: "127.0.0.1"
-  rport: 6379
-  rdb: 0
-  passwd: ''
+  addr: "127.0.0.1:6379"
+  db: 0
+  password: ""
   poolsize: 100

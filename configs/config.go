@@ -1,7 +1,6 @@
 package configs
 
 import (
-	"bitstorm/internal/pkg/middlewares/log"
 	"github.com/spf13/viper"
 	"sync"
 )
@@ -26,8 +25,7 @@ type LogConf struct {
 
 // DbConf db配置结构
 type DbConf struct {
-	Host        string `yaml:"host" mapstructure:"host"`                   // db主机地址
-	Port        string `yaml:"port" mapstructure:"port"`                   // db端口
+	Addr        string `yaml:"addr" mapstructure:"addr"`                   // db地址
 	User        string `yaml:"user" mapstructure:"user"`                   // 用户名
 	Password    string `yaml:"password" mapstructure:"password"`           // 密码
 	DataBase    string `yaml:"database" mapstructure:"database"`           // db名
@@ -38,19 +36,18 @@ type DbConf struct {
 
 // RedisConf 配置
 type RedisConf struct {
-	Host     string `yaml:"rhost" mapstructure:"rhost"` // db主机地址
-	PassWord string `yaml:"passwd" mapstructure:"passwd"`
-	Port     int    `yaml:"rport" mapstructure:"rport"` // db端口
-	DB       int    `yaml:"rdb" mapstructure:"rdb"`
+	Addr     string `yaml:"addr" mapstructure:"addr"`
+	PassWord string `yaml:"password" mapstructure:"password"`
+	DB       int    `yaml:"db" mapstructure:"db"`
 	PoolSize int    `yaml:"poolsize" mapstructure:"poolsize"`
 }
 
 // GlobalConfig 业务配置结构体
 type GlobalConfig struct {
 	AppConfig   AppConf   `yaml:"app" mapstructure:"app"`
-	DbConfig    DbConf    `yaml:"gormcli" mapstructure:"gormcli"`       // db配置
-	RedisConfig RedisConf `yaml:"redis" mapstructure:"redis"`           // redis配置
-	LogConfig   LogConf   `yaml:"log_config" mapstructure:"log_config"` //
+	DbConfig    DbConf    `yaml:"gormcli" mapstructure:"gormcli"` // db配置
+	RedisConfig RedisConf `yaml:"redis" mapstructure:"redis"`     // redis配置
+	LogConfig   LogConf   `yaml:"log" mapstructure:"log"`         //
 }
 
 var (
@@ -80,14 +77,7 @@ func readConf() {
 	}
 }
 
-// InitConfig 初始化日志
-func InitConfig() {
-	globalConf := GetGlobalConfig()
-
-	log.Init(
-		log.WithFileName(globalConf.LogConfig.FileName),
-		log.WithLogLevel(globalConf.LogConfig.Level),
-		log.WithLogPath(globalConf.LogConfig.LogPath),
-		log.WithMaxSize(globalConf.LogConfig.MaxSize),
-		log.WithMaxBackups(globalConf.LogConfig.MaxBackups))
+// InitConfig 配置初始化
+func InitConfig() *GlobalConfig {
+	return GetGlobalConfig()
 }

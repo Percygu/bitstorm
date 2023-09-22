@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 	"golang.org/x/net/context"
 	"sync/atomic"
 	"time"
@@ -12,7 +13,7 @@ import (
 
 const (
 	// 默认的分布式锁过期时间
-	DefaultLockExpireSeconds = 3
+	defaultLockExpireSeconds = 3
 	redisLockKeyPrefix       = "redisLock:"
 )
 
@@ -24,7 +25,7 @@ var (
 
 // 基于 redis 实现的分布式锁，不可重入，但保证了对称性
 type RedisLock struct {
-	LockOptions
+	lockOptions
 	key   string
 	token string
 	// 看门狗运作标识
@@ -33,7 +34,7 @@ type RedisLock struct {
 	stopDog context.CancelFunc
 }
 
-type LockOptions struct {
+type lockOptions struct {
 	isBlock              bool
 	watchDogWorkStepTime time.Duration // 看门狗工作时间间隙
 	blockWaitingSecond   int64         // 阻塞等待加锁时间
@@ -41,38 +42,38 @@ type LockOptions struct {
 	watchDogMode         bool          // 是否开启看门狗
 }
 
-type LockOption func(*LockOptions)
+type LockOption func(*lockOptions)
 
 // WithLock 设置阻塞模式
 func WithBlock() LockOption {
-	return func(o *LockOptions) {
+	return func(o *lockOptions) {
 		o.isBlock = true
 	}
 }
 
 // 设置阻塞最长等待时间
 func WithBlockWaitingSeconds(waitingSeconds int64) LockOption {
-	return func(o *LockOptions) {
+	return func(o *lockOptions) {
 		o.blockWaitingSecond = waitingSeconds
 	}
 }
 
 // 设置过期时间
 func WithExpireSeconds(expireTime int64) LockOption {
-	return func(o *LockOptions) {
+	return func(o *lockOptions) {
 		o.expireTimeSecond = expireTime
 	}
 }
 
 // 启动看门狗
 func WithWatchDogMode() LockOption {
-	return func(o *LockOptions) {
+	return func(o *lockOptions) {
 		o.watchDogMode = true
 	}
 }
 
 // repairLock 修复分布式锁选项
-func repairLock(o *LockOptions) {
+func repairLock(o *lockOptions) {
 	if o.isBlock && o.blockWaitingSecond <= 0 {
 		// 默认阻塞等待时间上限为 5 秒
 		o.blockWaitingSecond = 5
@@ -95,7 +96,7 @@ func isRetryableErr(err error) bool {
 	return errors.Is(err, ErrLockAcquiredByOthers)
 }
 
-func NewRedisLock(key string, opts ...LockOption) *RedisLock {
+func NewRedisLock(key string, client *redis.Client, opts ...LockOption) *RedisLock {
 	id, _ := uuid.NewUUID()
 	r := RedisLock{
 		key:   key,
@@ -103,10 +104,10 @@ func NewRedisLock(key string, opts ...LockOption) *RedisLock {
 	}
 
 	for _, opt := range opts {
-		opt(&r.LockOptions)
+		opt(&r.lockOptions)
 	}
 
-	repairLock(&r.LockOptions)
+	repairLock(&r.lockOptions)
 	return &r
 }
 

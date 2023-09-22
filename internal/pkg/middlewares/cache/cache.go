@@ -1,35 +1,78 @@
 package cache
 
 import (
-	"bitstorm/configs"
 	"bitstorm/internal/pkg/middlewares/log"
-	"fmt"
 	redis "github.com/redis/go-redis/v9"
 	"golang.org/x/net/context"
 	"strconv"
-	"sync"
 	"time"
 )
 
 var (
 	client    *Client = &Client{}
 	redisConn *redis.Client
-	redisOnce sync.Once
 )
 
 type Client struct {
 }
 
+type Options struct {
+	passWord string
+	db       int
+	poolSize int
+	addr     string // 地址，IP:PORT
+}
+
+type Option func(*Options)
+
+func WithPassWord(passWord string) Option {
+	return func(o *Options) {
+		o.passWord = passWord
+	}
+}
+
+func WithDB(db int) Option {
+	return func(o *Options) {
+		o.db = db
+	}
+}
+
+func WithPoolSize(poolSize int) Option {
+	return func(o *Options) {
+		o.poolSize = poolSize
+	}
+}
+
+func WithAddr(addr string) Option {
+	return func(o *Options) {
+		o.addr = addr
+	}
+}
+func newOptions(opts ...Option) Options {
+	// 默认配置
+	options := Options{
+		addr:     "127.0.0.1:6379",
+		db:       0,
+		poolSize: 10,
+		passWord: "",
+	}
+	for _, opt := range opts {
+		opt(&options)
+	}
+	return options
+}
+
 // initRedis 初始化db连接
-func initRedis() {
-	redisConfig := configs.GetGlobalConfig().RedisConfig
-	log.Infof("redisConfig:%+v", redisConfig)
-	addr := fmt.Sprintf("%s:%d", redisConfig.Host, redisConfig.Port)
+func Init(options ...Option) {
+	newRedisConn(newOptions(options...))
+}
+
+func newRedisConn(options Options) {
 	redisConn = redis.NewClient(&redis.Options{
-		Addr:     addr,
-		Password: redisConfig.PassWord,
-		DB:       redisConfig.DB,
-		PoolSize: redisConfig.PoolSize,
+		Addr:     options.addr,
+		Password: options.passWord,
+		DB:       options.db,
+		PoolSize: options.poolSize,
 	})
 	if redisConn == nil {
 		panic("failed to call redis.NewClient")
@@ -38,7 +81,6 @@ func initRedis() {
 	if err != nil {
 		panic("Failed to ping redis, err:%s")
 	}
-
 }
 
 func (client *Client) CloseRedis() {
@@ -49,7 +91,6 @@ func (client *Client) CloseRedis() {
 
 // GetRedisCli 获取数据库连接
 func GetRedisCli() *Client {
-	redisOnce.Do(initRedis)
 	return client
 }
 
